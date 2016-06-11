@@ -1,7 +1,7 @@
 NUM_NODES = 10
 WORLD_SIZE = 1000
 
-COMMON_CFLAGS = -g -std=gnu99 -O2 -mcpu=native -fomit-frame-pointer -Wall -Wextra
+COMMON_CFLAGS = -std=gnu99 -O2 -march=native -fomit-frame-pointer -Wall -Wextra
 
 buildall: c_fast c_fast_arm f03 c fsharp cpp_gcc cpp_clang cpp_cached racket csharp java haskell ocaml lisp rust rust_unsafe go gccgo d nim oraclejava crystal
 
@@ -9,13 +9,17 @@ clean:
 	rm -f c_fast_arm c_fast f03 fs.exe cpp_gcc cpp_clang cpp_plain cpp_cached \
 		cs.exe jv.class hs ml lisp rs rs_unsafe go gccgo d nim crystal d \
 		c
+# C targets
+c: c.c
+	$(CC) $(COMMON_CFLAGS) c.c -o c -DUSE_HIGHBIT
 
 c_fast_arm: c_fast.c
-	gcc -marm -falign-functions=32 $(COMMON_CFLAGS) c_fast.c -o ./c_fast_arm
+	$(CC) -marm -falign-functions=32 $(COMMON_CFLAGS) c_fast.c -o ./c_fast_arm
 
 c_fast: c_fast.c
-	gcc -falign-functions=32 $(COMMON_CFLAGS) c_fast.c -o ./c_fast
+	$(CC) -falign-functions=32 $(COMMON_CFLAGS) c_fast.c -o ./c_fast
 
+# Other
 f03:    f03.f03
 	gfortran -O2 -mcpu=native f03.f03 -o f03
 
@@ -33,9 +37,6 @@ cpp_plain: cpp_plain.cpp
 
 cpp_cached: cpp_cached.cpp
 	clang++ cpp_cached.cpp -std=c++14 -Wall -O2 -mcpu=native -o cpp_cached
-
-c: c.c
-	gcc $(COMMON_CFLAGS) c.c -o c -DUSE_HIGHBIT
 
 racket: rkt.rkt
 	raco exe rkt.rkt
