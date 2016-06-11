@@ -24,7 +24,7 @@
    IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    *******************
-   
+
    See https://github.com/logicchains/LPATHBench
 
    The edges are stored as an array of pointers to arrays of edges, i.e: the edges
@@ -34,13 +34,13 @@
         maximize the density of useful data in caches
      * it achieves performance almost as good as a statically sized matrix, while
        allowing dynamic sizing
-       
+
    This has only been optimised for Tegra K1, a Cortex-A15-based SoC when compiled
    with gcc 4.8.2. Performance seems highly dependent on code alignment.
-   
+
    Peformance (with provided benchmark graph): around 10% speedup compared to cpp,
    and around 15% compared to C/HIGHBIT.
-   
+
    Note that C/HIGHBIT has been observed to be faster on a second sparse graph with
    35 nodes.
 */
@@ -82,23 +82,22 @@ void parse_graph(edge_t ***costs_p, int *no_of_nodes_p) {
   int target_node;
   int cost;
   int index = 0;
-  int wp;
   int no_of_nodes;
   edge_t **costs;
-  
+
   f = fopen("agraph", "r");
   assert(f != NULL);
-  
+
   ret = fscanf(f, "%d", no_of_nodes_p);
   assert (ret == 1);
   no_of_nodes = *no_of_nodes_p;
-  
+
   costs = malloc(sizeof(edge_t*) * no_of_nodes);
   assert(costs != NULL);
   *costs_p = costs;
   edge_t *buf = malloc(sizeof(edge_t) * no_of_nodes);
   assert(buf != NULL);
-  
+
   while(fscanf(f, "%d %d %d\n", &c_node, &target_node, &cost) == 3) {
     assert((c_node == prev_node || c_node == (prev_node + 1)) && c_node < no_of_nodes && cost >= 0);
     if (c_node != prev_node) {
@@ -111,17 +110,17 @@ void parse_graph(edge_t ***costs_p, int *no_of_nodes_p) {
     }
     buf[target_node].target = target_node;
     buf[target_node].cost = cost;
- 
+
     index++;
   }
-  
+
   insert_node_edges(costs, prev_node, buf, no_of_nodes, index);
 }
 
 int get_max_cost_small(edge_t **c, const int c_node, uint32_t visited) {
   int max = 0;
   int dist;
-  
+
   visited |= 1 << c_node;
   for (int index = 0; c[c_node][index].cost >= 0; index++) {
     if (!(visited & (1 << c[c_node][index].target))) {
@@ -130,7 +129,7 @@ int get_max_cost_small(edge_t **c, const int c_node, uint32_t visited) {
     }
   }
   visited &= ~(1 << c_node);
-  
+
   return max;
 }
 
@@ -138,7 +137,7 @@ int get_max_cost(edge_t **c, const int c_node, uint32_t *visited) {
   int max = 0;
   int dist;
   int target;
-  
+
   visited[c_node >> 5] |= 1 << (c_node & 0x1f);
   for (int index = 0; c[c_node][index].cost >= 0; index++) {
     target = c[c_node][index].target;
@@ -148,7 +147,7 @@ int get_max_cost(edge_t **c, const int c_node, uint32_t *visited) {
     }
   }
   visited[c_node >> 5] &= ~(1 << (c_node & 0x1f));
-  
+
   return max;
 }
 
@@ -159,7 +158,7 @@ int main() {
   struct timeval start, end, duration;
   edge_t **costs;
   int no_of_nodes;
-  
+
   parse_graph(&costs, &no_of_nodes);
 
   gettimeofday(&start, NULL);
@@ -171,9 +170,8 @@ int main() {
     result = get_max_cost_small(costs, 0, 0);
   }
   gettimeofday(&end, NULL);
-  
+
   timersub(&end, &start, &duration);
   ms = duration.tv_sec*1000 + duration.tv_usec/1000;
-  printf("%d LANGUAGE C-fast %llu\n", result, ms);
+  printf("%d LANGUAGE C-fast %lu\n", result, ms);
 }
-
