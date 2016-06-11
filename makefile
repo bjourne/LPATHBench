@@ -1,14 +1,15 @@
 NUM_NODES = 10
 WORLD_SIZE = 1000
 
+COMMON_CFLAGS = -g -std=gnu99 -O2 -mcpu=native -fomit-frame-pointer -Wall -Wextra
 
 buildall: c_fast c_fast_arm f03 c fsharp cpp_gcc cpp_clang cpp_cached racket csharp java haskell ocaml lisp rust rust_unsafe go gccgo d nim oraclejava crystal
 
 c_fast_arm: c_fast.c
-	gcc -marm -falign-functions=32 -g -std=gnu99 -O2 -mcpu=native -fomit-frame-pointer c_fast.c -o ./c_fast_arm
-	
+	gcc -marm -falign-functions=32 $(COMMON_CFLAGS) c_fast.c -o ./c_fast_arm
+
 c_fast: c_fast.c
-	gcc -falign-functions=32 -g -std=gnu99 -O2 -mcpu=native -fomit-frame-pointer c_fast.c -o ./c_fast
+	gcc -falign-functions=32 $(COMMON_CFLAGS) c_fast.c -o ./c_fast
 
 f03:    f03.f03
 	gfortran -O2 -mcpu=native f03.f03 -o f03
@@ -29,7 +30,7 @@ cpp_cached: cpp_cached.cpp
 	clang++ cpp_cached.cpp -std=c++14 -Wall -O2 -mcpu=native -o cpp_cached
 
 c: c.c
-	gcc -g -std=gnu99 -Wall -Wextra c.c  -O2 -mcpu=native -o c -DUSE_HIGHBIT
+	gcc $(COMMON_CFLAGS) c.c -o c -DUSE_HIGHBIT
 
 racket: rkt.rkt
 	raco exe rkt.rkt
@@ -59,7 +60,7 @@ rust: rs.rs
 	rustc rs.rs --opt-level=3 -C no-stack-check
 
 rust_unsafe: rs_unsafe.rs
-	rustc rs_unsafe.rs --opt-level=3	
+	rustc rs_unsafe.rs --opt-level=3
 
 go: go.go
 	go build go.go
@@ -80,7 +81,7 @@ nim: nim.nim
 	nim c --cc:clang --passC:-mcpu=native -d:release nim.nim
 
 scala: scala.scala
-	scalac scala.scala 
+	scalac scala.scala
 
 graphbuilder: mkgraph.go
 	go build mkgraph.go
