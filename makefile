@@ -2,6 +2,7 @@ NUM_NODES = 10
 WORLD_SIZE = 1000
 
 COMMON_CFLAGS = -std=gnu99 -O2 -march=native -fomit-frame-pointer -Wall -Wextra
+COMMON_CXXFLAGS = -std=c++14 -Wall -O2 -march=native
 
 buildall: c_fast c_fast_arm f03 c fsharp cpp_gcc cpp_clang cpp_cached racket csharp java haskell ocaml lisp rust rust_unsafe go gccgo d nim oraclejava crystal
 
@@ -27,16 +28,16 @@ fsharp: fs.fs
 	fsharpc fs.fs
 
 cpp_gcc: cpp.cpp
-	g++ cpp.cpp -std=c++14 -Wall -O2 -mcpu=native -DCOMPILER='"gcc"' -o cpp_gcc
+	g++ cpp.cpp $(COMMON_CXXFLAGS) -DCOMPILER='"gcc"' -o cpp_gcc
 
 cpp_clang: cpp.cpp
-	clang++ cpp.cpp -std=c++14 -Wall -O2 -mcpu=native -DCOMPILER='"clang"' -o cpp_clang
+	clang++ cpp.cpp $(COMMON_CXXFLAGS) -DCOMPILER='"clang"' -o cpp_clang
 
 cpp_plain: cpp_plain.cpp
-	clang++ cpp_plain.cpp -std=c++14 -Wall -O2 -mcpu=native -DCOMPILER='"clang"' -o cpp_plain
+	clang++ cpp_plain.cpp $(COMMON_CXXFLAGS) -DCOMPILER='"clang"' -o cpp_plain
 
 cpp_cached: cpp_cached.cpp
-	clang++ cpp_cached.cpp -std=c++14 -Wall -O2 -mcpu=native -o cpp_cached
+	clang++ cpp_cached.cpp $(COMMON_CXXFLAGS) -o cpp_cached
 
 racket: rkt.rkt
 	raco exe rkt.rkt
