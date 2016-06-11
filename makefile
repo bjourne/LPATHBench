@@ -5,6 +5,11 @@ COMMON_CFLAGS = -g -std=gnu99 -O2 -mcpu=native -fomit-frame-pointer -Wall -Wextr
 
 buildall: c_fast c_fast_arm f03 c fsharp cpp_gcc cpp_clang cpp_cached racket csharp java haskell ocaml lisp rust rust_unsafe go gccgo d nim oraclejava crystal
 
+clean:
+	rm -f c_fast_arm c_fast f03 fs.exe cpp_gcc cpp_clang cpp_plain cpp_cached \
+		cs.exe jv.class hs ml lisp rs rs_unsafe go gccgo d nim crystal d \
+		c
+
 c_fast_arm: c_fast.c
 	gcc -marm -falign-functions=32 $(COMMON_CFLAGS) c_fast.c -o ./c_fast_arm
 
